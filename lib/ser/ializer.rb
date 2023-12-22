@@ -186,7 +186,8 @@ module Ser
       end
 
       def serialize_one(object, context)
-        fields_for_serialization(context).each_with_object({}) do |field, data|
+        fields = fields_for_serialization(context)
+        fields.each_with_object({}) do |field, data|
           next unless field.valid_for_context?(object, context)
 
           value = public_send(field.name, object, context)
@@ -199,10 +200,8 @@ module Ser
 
       def fields_for_serialization(context)
         field_names = fields_names_for_serialization(context)
-        attribute_values = attributes.values
-        attribute_values -= context[:exclude] if context[:exclude].present?
 
-        return attributes_values unless field_names
+        return attributes.values unless field_names
 
         attributes.values_at(*field_names).compact
       end
@@ -211,13 +210,29 @@ module Ser
         return nil unless context
 
         if context.is_a?(Hash)
-          context = context.with_indifferent_access
-          return context[:attributes] || context[:include]
+          result = selected_attributes(context)
+          return result if result
+
         end
 
         return context.attributes if context.respond_to?(:attributes)
 
+        return attrs_after_exclude(context.exclude) if context.respond_to?(:exclude)
+
         nil
+      end
+
+      def selected_attributes(context)
+        context = context.with_indifferent_access
+        context[:attributes] ||
+          context[:include] ||
+          attrs_after_exclude(context[:exclude])
+      end
+
+      def attrs_after_exclude(excluded_keys)
+        return unless excluded_keys
+
+        attributes.values.map(&:key) - excluded_keys&.map(&:to_s)
       end
 
       def valid_enumerable?(object)

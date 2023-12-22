@@ -56,7 +56,8 @@ module Ializer
     # :attr_accessor: page_info
     #
     # When serializing objects, return custom defined page info
-    # any of the methods defined should be able to be called on the hash or object passed as context to the .serialize_json method
+    # any of the methods defined should be able to be called on the hash or
+    # object passed as context to the .serialize_json method
     attr_accessor :page_info
   end
 end

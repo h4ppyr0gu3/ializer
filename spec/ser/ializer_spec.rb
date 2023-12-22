@@ -37,6 +37,14 @@ RSpec.describe Ser::Ializer do
       expect(data.length).to eq 2
     end
 
+    it "doesn't serialize excluded attributes" do
+      data = NamedMethodDeSer.serialize(order, exclude: %i[symbol-prop string-prop])
+      expect(data.length).to eq 7
+      expect(data['symbol-prop']).to eq nil
+      expect(data['string-prop']).to eq nil
+      expect(data['integer-prop']).to be_present
+    end
+
     it 'serializes an array of attributes from context correctly' do
       context = OpenStruct.new(attributes: %w[string-prop symbol-prop])
 
