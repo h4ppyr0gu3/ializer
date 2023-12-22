@@ -199,8 +199,10 @@ module Ser
 
       def fields_for_serialization(context)
         field_names = fields_names_for_serialization(context)
+        attribute_values = attributes.values
+        attribute_values -= context[:exclude] if context[:exclude].present?
 
-        return attributes.values unless field_names
+        return attributes_values unless field_names
 
         attributes.values_at(*field_names).compact
       end
