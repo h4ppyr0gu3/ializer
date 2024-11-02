@@ -240,6 +240,8 @@ module Ser
 
         return true if defined?(ActiveRecord) && object.is_a?(ActiveRecord::Relation)
 
+        return true if defined?(ActiveStorage) && object.is_a?(ActiveStorage::Attached::Many)
+
         false
       end
     end
